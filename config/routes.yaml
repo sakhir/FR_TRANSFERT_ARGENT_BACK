@@ -1,0 +1,26 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+authentication_token:
+    path: /api/login_check
+    methods: ['POST']
+#creation users
+create_user:
+   path: /api/all/users
+   controller: App\Controller\UserController::addUser
+   methods: ['POST']
+#creation partenaire 
+create_partenaire:
+   path: /api/partenaire/create
+   controller: App\Controller\PartenaireController::addPartenaireEtCompte
+   methods: ['POST']
+#attribuer des utilisareurs a un compte donc a une agence 
+attribuer_users_partenaire:
+   path: /api/partenaire/{id}/ajout-users
+   controller: App\Controller\PartenaireController::AttibuerUsersAgence
+   methods: ['POST']
+#edit users
+edit_user:
+   path: /api/users/{id}
+   controller: App\Controller\UserController::EditUser
+   methods: ['POST']
