@@ -9,6 +9,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
+
 
 
 
@@ -45,6 +49,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *      }
  * },
  * )
+ * @ApiFilter(SearchFilter::class, properties={ "isdeleted": "exact"})
  */
 class User implements UserInterface
 {
@@ -52,13 +57,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"profil:read","user:read","partenaire"})
+     * @Groups({"profil:read","user:read","partenaire","depot"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"profil:read","user:read","partenaire"})
+     * @Groups({"profil:read","user:read","partenaire","depot","transaction"})
      */
     private $email;
 
@@ -72,19 +77,19 @@ class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255,nullable=true)
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"profil:read","user:read","partenaire"})
+     * @Groups({"profil:read","user:read","partenaire","depot","transaction"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"profil:read","user:read","partenaire"})
+     * @Groups({"profil:read","user:read","partenaire","depot","transaction"})
      */
     private $nom;
 
@@ -112,7 +117,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Profil::class, inversedBy="users")
-     * @Groups({"user:read","partenaire"})
+     * @Groups({"user:read","partenaire","depot","transaction"})
      */
     private $profil;
 
@@ -144,15 +149,17 @@ class User implements UserInterface
     private $isdeleted;
 
     /**
-     * @ORM\OneToMany(targetEntity=Transaction::class, mappedBy="userRetrait")
+     * @ORM\OneToMany(targetEntity=Transaction::class, mappedBy="userRet")
      */
-    private $transactionsRet;
+    private $transactionsr;
+
 
     public function __construct()
     {
         $this->depots = new ArrayCollection();
         $this->transactions = new ArrayCollection();
         $this->transactionsRet = new ArrayCollection();
+        $this->transactionsr = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -432,30 +439,32 @@ class User implements UserInterface
     /**
      * @return Collection|Transaction[]
      */
-    public function getTransactionsRet(): Collection
+    public function getTransactionsr(): Collection
     {
-        return $this->transactionsRet;
+        return $this->transactionsr;
     }
 
-    public function addTransactionsRet(Transaction $transactionsRet): self
+    public function addTransactionsr(Transaction $transactionsr): self
     {
-        if (!$this->transactionsRet->contains($transactionsRet)) {
-            $this->transactionsRet[] = $transactionsRet;
-            $transactionsRet->setUserRetrait($this);
+        if (!$this->transactionsr->contains($transactionsr)) {
+            $this->transactionsr[] = $transactionsr;
+            $transactionsr->setUserRet($this);
         }
 
         return $this;
     }
 
-    public function removeTransactionsRet(Transaction $transactionsRet): self
+    public function removeTransactionsr(Transaction $transactionsr): self
     {
-        if ($this->transactionsRet->removeElement($transactionsRet)) {
+        if ($this->transactionsr->removeElement($transactionsr)) {
             // set the owning side to null (unless already changed)
-            if ($transactionsRet->getUserRetrait() === $this) {
-                $transactionsRet->setUserRetrait(null);
+            if ($transactionsr->getUserRet() === $this) {
+                $transactionsr->setUserRet(null);
             }
         }
 
         return $this;
     }
+
+    
 }

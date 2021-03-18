@@ -66,7 +66,7 @@ class Profil
     /**
      * @Assert\NotBlank(message="veuillez entrer le profil")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"profil:read","user:read","partenaire"})
+     * @Groups({"profil:read","user:read","partenaire","depot","transaction"})
      */
     private $libelle;
 

@@ -2,12 +2,45 @@
 
 namespace App\Entity;
 
-use App\Repository\TransactionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TransactionRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * * @ApiResource(
+ * attributes={
+ *      "pagination_enabled"=true,
+ *      "security" = "(is_granted('ROLE_Partenaire') or is_granted('ROLE_Super-Admin'))   ",
+ *      "security_message" = "vous n'avez pas accès a cette resource"
+ *   },
+ * collectionOperations={
+ * 
+ * "get_transactions"={
+ *          "method"= "GET",
+ *          "path" = "/all/transactions",
+ *          "normalization_context"={"groups"={"transaction"}}    
+ *    },
+ * 
+ * 
+ * "faire_transaction_depot"={
+ *          "route_name"="faire_transaction_depot",
+ *   },
+ *   "faire_transaction_retrait"={
+ *          "route_name"="faire_transaction_retrait",
+ *   },
+ * },
+ * itemOperations={
+ *   
+ *      "get_one_transaction"={
+ *             "method"="GET",
+ *             "path" = "/transaction/{id}",
+ *              "normalization_context"={"groups"={"transaction"}},
+ *      }
+ * },
+ * )
  * @ORM\Entity(repositoryClass=TransactionRepository::class)
  */
 class Transaction
@@ -21,56 +54,67 @@ class Transaction
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $nomEnvoyeur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $prenomEnvoyeur;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"transaction"})
      */
     private $adresseEnvoyeur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $telEnvoyeur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $cinEnvoyeur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $nomBeneficiaire;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $prenomBeneficiaire;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction","trans"})
      */
     private $telBeneficiaire;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"transaction"})
      */
     private $adresseBeneficiaire;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"transaction"})
      */
     private $codeTransaction;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"transaction","trans"})
      */
     private $montantEnvoyer;
 
@@ -85,12 +129,14 @@ class Transaction
     private $montantRetirer;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255,nullable=true)
+     * @Groups({"transaction"})
      */
     private $cinBeneficiaire;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"transaction"})
      */
     private $dateEnvoie;
 
@@ -101,38 +147,52 @@ class Transaction
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"transaction"})
      */
     private $type;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"transaction"})
      */
     private $commissionEtat;
+      /**
+     * @ORM\Column(type="float")
+     * @Groups({"transaction"})
+     */
+    private $commissionSystem;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"transaction"})
      */
     private $commissionEnvoi;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="float",nullable=true)
+     * @Groups({"transaction"})
      */
     private $commissionRetrait;
 
     /**
      * @ORM\ManyToOne(targetEntity=Commission::class, inversedBy="transactions")
+     * @Groups({"transaction"})
      */
     private $commissionTTC;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
+     * @Groups({"transaction"})
      */
     private $userDepot;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionsRet")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactionsr")
+     * @ORM\JoinColumn(nullable=true)
      */
-    private $userRetrait;
+    private $userRet;
+
+  
 
    
 
@@ -254,12 +314,12 @@ class Transaction
         return $this;
     }
 
-    public function getCodeTransaction(): ?float
+    public function getCodeTransaction(): ?string
     {
         return $this->codeTransaction;
     }
 
-    public function setCodeTransaction(float $codeTransaction): self
+    public function setCodeTransaction(string $codeTransaction): self
     {
         $this->codeTransaction = $codeTransaction;
 
@@ -361,6 +421,17 @@ class Transaction
 
         return $this;
     }
+    public function getCommissionSystem(): ?float
+    {
+        return $this->commissionSystem;
+    }
+
+    public function setCommissionSystem(float $commissionSystem): self
+    {
+        $this->commissionSystem = $commissionSystem;
+
+        return $this;
+    }
 
     public function getCommissionEnvoi(): ?float
     {
@@ -410,17 +481,21 @@ class Transaction
         return $this;
     }
 
-    public function getUserRetrait()
+    public function getUserRet(): ?User
     {
-        return $this->userRetrait;
+        return $this->userRet;
     }
 
-    public function setUserRetrait(?User $userRetrait): self
+    public function setUserRet(?User $userRet): self
     {
-        $this->userRetrait = $userRetrait;
+        $this->userRet = $userRet;
 
         return $this;
     }
+
+    
+
+  
 
     
 }

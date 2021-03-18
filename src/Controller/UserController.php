@@ -50,7 +50,9 @@ class UserController extends AbstractController
             $userpost =$request->request->all();
             if(isset($userpost['avatar'])){
                 unset($userpost['avatar']);
+                
             }
+            
            $helperUser->createUser($request);
            return $this->json('User added successfully',Response::HTTP_OK);
        
@@ -61,7 +63,9 @@ class UserController extends AbstractController
         $data=$request->request->all();
         if(isset($data['avatar'])){
             unset($data['avatar']);
+            
         }
+        
         $user=$this->repo->find($id);
         
         //
@@ -94,6 +98,31 @@ class UserController extends AbstractController
         $this->em->flush();
          return $this->json('Modification reuissie',Response::HTTP_OK);
         //
+       
+    }
+
+
+    //Cette fonction cherche a bloquer un utilisateur d une agence de facto il pourra pas faire des transactoins  
+    public function deleteUser(UserRepository $repo,$id,EntityManagerInterface $em)
+    {
+        $user = $repo->find($id);
+  
+        $CurrentUser=$this->getUser();
+     
+
+         if($user->getPartenaire()->getId()!=$CurrentUser->getPartenaire()->getId()) {
+            return $this->json('vous n avez pas le droit de bloquer cet utilisateur  ',Response::HTTP_OK); 
+         }
+
+         else {
+            if ($this->isGranted('ROLE_Admin-Partenaire') && $user != null) {
+                $user->setIsdeleted(1);
+                $em->flush();
+                return $this->json('Utilisateur bloqué ',Response::HTTP_OK); 
+            }
+            return $this->json("Vous n avez pas le droit de faire cet opération ou  utilisateur inexistant !!!");
+         }
+
        
     }
        

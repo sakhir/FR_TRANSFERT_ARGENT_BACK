@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ApiResource(
  * attributes={
  *      "pagination_enabled"=true,
- *      "security" = "(is_granted('ROLE_Super-Admin') or is_granted('ROLE_Admin-partenaire'))",
+ *      "security" = "(is_granted('ROLE_Super-Admin') or is_granted('ROLE_Admin-partenaire') or is_granted('ROLE_Caissier'))",
  *      "security_message" = "vous n'avez pas accès a cette resource"
  *   },
  * collectionOperations={
@@ -55,25 +55,25 @@ class Compte
 
     /**
      * @ORM\Column(type="string",unique=true)
-     * @Groups({"partenaire","compte"})
+     * @Groups({"partenaire","compte","depot"})
      */
     private $numeroCompte;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"partenaire","compte"})
+     * @Groups({"partenaire","compte","depot"})
      */
     private $codeBank;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"partenaire","compte"})
+     * @Groups({"partenaire","compte","depot"})
      */
     private $nomBeneficiaire;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"partenaire","compte"})
+     * @Groups({"partenaire","compte","depot"})
      */
     private $solde;
 
@@ -86,6 +86,16 @@ class Compte
      * @ORM\OneToMany(targetEntity=Depot::class, mappedBy="compte")
      */
     private $depots;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $statut;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Partenaire::class, inversedBy="compts")
+     */
+    private $partenaire;
 
     public function __construct()
     {
@@ -202,6 +212,30 @@ class Compte
                 $depot->setCompte(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStatut(): ?bool
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(?bool $statut): self
+    {
+        $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getPartenaire(): ?Partenaire
+    {
+        return $this->partenaire;
+    }
+
+    public function setPartenaire(?Partenaire $partenaire): self
+    {
+        $this->partenaire = $partenaire;
 
         return $this;
     }

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -44,6 +45,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *      },
  *  "attribuer_users_partenaire"={
  *             "route_name"="attribuer_users_partenaire",
+ *      },
+ * "editer_partenaire"={
+ *             "route_name"="editer_partenaire",
+ *      },
+ * "bloquer_partenaire"={
+ *             "route_name"="bloquer_partenaire",
  *      }
  * },
  * )
@@ -67,6 +74,7 @@ class Partenaire
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message= "le libelle de la localisation  ne peut pas etre vide")
      * @Groups({"partenaire"})
      */
     private $localisation;
@@ -74,11 +82,13 @@ class Partenaire
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"partenaire"})
+     * @Assert\NotBlank(message= "le libelle du domaine d activite ne peut pas etre vide")
      */
     private $domaineActivite;
 
       /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message= "le nom du partenaire  peut pas etre vide")
      * @Groups({"partenaire"})
      */
     private $nomPartenaire;
@@ -107,11 +117,17 @@ class Partenaire
      */
     private $statut;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="partenaire", cascade={"persist", "remove"})
+     */
+    private $compts;
+
   
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->compts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -228,6 +244,36 @@ class Partenaire
     public function setStatut(bool $statut): self
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Compte[]
+     */
+    public function getCompts(): Collection
+    {
+        return $this->compts;
+    }
+
+    public function addCompt(Compte $compt): self
+    {
+        if (!$this->compts->contains($compt)) {
+            $this->compts[] = $compt;
+            $compt->setPartenaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompt(Compte $compt): self
+    {
+        if ($this->compts->removeElement($compt)) {
+            // set the owning side to null (unless already changed)
+            if ($compt->getPartenaire() === $this) {
+                $compt->setPartenaire(null);
+            }
+        }
 
         return $this;
     }

@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use App\Entity\User;
 use App\Entity\Profil;
+use App\Repository\CompteRepository;
 use App\Repository\ProfilRepository;
 use Doctrine\Persistence\ObjectManager;
 use App\Repository\PartenaireRepository;
@@ -19,20 +20,26 @@ class UserHelper
      private $profilRepo ;
      private $part;
      private $serializer;
+     private $comptRepo;
 
-    public function __construct(EntityManagerInterface $manager , UserPasswordEncoderInterface $encode ,ProfilRepository $profilRepo ,PartenaireRepository $part ,SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $manager , UserPasswordEncoderInterface $encode ,ProfilRepository $profilRepo ,PartenaireRepository $part ,SerializerInterface $serializer ,CompteRepository $comptRepo)
     {
         $this->manager = $manager;
         $this->encode = $encode;
         $this->profilRepo=$profilRepo ;
         $this->part=$part ;
         $this->serializer=$serializer;
+        $this->comptRepo=$comptRepo;
     }
 
     public function createUser($request) {
       
 
    $data=$request->request->all();
+   if(isset($data['avatar'])){
+    unset($data['avatar']);
+    
+}
    $profil=$this->profilRepo->findById($data['profil']);
   if(isset($data['agence'])) {
     $agence=$this->part->find($data['agence']);
@@ -47,7 +54,14 @@ class UserHelper
     $user->setStatut(0);
     
     if(isset($agence)) {
+      
         $user->setPartenaire($agence);
+   // on va trouver le compte de cette agence
+        
+        $compt=$this->comptRepo->find($agence->getCompte()->getId());
+       
+        $user->setCompte($compt);
+        
     }
     else {
         $user->setPartenaire(null);  

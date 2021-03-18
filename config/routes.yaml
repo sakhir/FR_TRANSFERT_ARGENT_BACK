@@ -6,7 +6,7 @@ authentication_token:
     methods: ['POST']
 #creation users
 create_user:
-   path: /api/all/users
+   path: /api/create/user
    controller: App\Controller\UserController::addUser
    methods: ['POST']
 #creation partenaire 
@@ -23,4 +23,69 @@ attribuer_users_partenaire:
 edit_user:
    path: /api/users/{id}
    controller: App\Controller\UserController::EditUser
+   methods: ['POST']
+#edit partenaire
+editer_partenaire:
+   path: /api/update/partenaire/{id}
+   controller: App\Controller\PartenaireController::EditPartenaire
+   methods: ['POST']
+
+#edit partenaire
+bloquer_partenaire:
+   path: /api/bloquer/partenaire/{id}
+   controller: App\Controller\PartenaireController::BloquerPartenaire
+   methods: ['POST']
+#faire-depot
+faire_depot:
+   path: /api/faire/depot
+   controller: App\Controller\PartenaireController::FaireDepot
+   methods: ['POST']
+# faire une transaction (depot)
+faire_transaction_depot:
+   path: /api/envoyer/argent
+   controller: App\Controller\TransactionController::EnvoyerArgent
+   methods: ['POST']
+# faire un retrait 
+faire_transaction_retrait:
+   path: /api/retirer/argent
+   controller: App\Controller\TransactionController::RetirerArgent
+   methods: ['POST']
+
+# Recuperer la transaction d un utilisateur 
+recuperer_transaction_utilisateur:
+   path: /api/user/{id}/transactions
+   controller: App\Controller\TransactionController::AffciherTransactionUser
+   methods: ['GET']
+
+# Recuperer la transaction d une agence 
+recuperer_transaction_agence:
+   path: /api/agence/{id}/transactions
+   controller: App\Controller\TransactionController::AfficherTransactionsAgence
+   methods: ['GET']   
+
+#Bloquer user
+bloquer_user:
+   path: /api/bloquer/user/{id}
+   controller: App\Controller\UserController::deleteUser
+   methods: ['DELETE']
+#annuler depot 
+annuler_depot:
+   path: /api/annuler/dernier/depot
+   controller: App\Controller\PartenaireController::AnnulerDepot
+   methods: ['DELETE']
+#annuler transaction 
+annuler_transaction:
+   path: /api/annuler/dernier/transaction
+   controller: App\Controller\TransactionController::AnnulerTransaction
+   methods: ['POST']
+
+#Recuperer tatif 
+recuperer_tarif:
+   path: /api/Trouvertarif
+   controller: App\Controller\TransactionController::TrouverTarif
+   methods: ['POST']
+#Recuperer code 
+recuperer_code:
+   path: /api/TrouverCode
+   controller: App\Controller\TransactionController::TrouverCoder
    methods: ['POST']
