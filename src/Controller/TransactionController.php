@@ -133,6 +133,7 @@ class TransactionController extends AbstractController
     }
     
     $comptepartenaire->setSolde($comptepartenaire->getSolde() - ($data[$montants]+ $montant) + (($montant*10)/100));
+    $comptepartenaire->setDatemaj(new \DateTime());
     $this->manager->persist($transaction);
     $this->manager->flush();
 
@@ -198,7 +199,7 @@ class TransactionController extends AbstractController
       
         if (!$errors) { 
             $comptepartenaire->setSolde($comptepartenaire->getSolde() + ($transaction[0]->getTotalEnvoyer() - $transaction[0]->getCommissionTTC()->getValeur()) + ($transaction[0]->getCommissionTTC()->getValeur()*20)/100);
-        
+            $comptepartenaire->setDatemaj(new \DateTime());
             $this->manager->persist($transaction[0]);
         $this->manager->flush();
         return $this->json('Le retrait fait avec succes : '.$transaction[0]->getCodeTransaction().' avec le montant  '.$transaction[0]->getMontantRetirer() ,Response::HTTP_OK);
@@ -312,13 +313,14 @@ class TransactionController extends AbstractController
             // je vais  a present recuperer le compte de l utilisateur connecté et enlever ce montant 
             $comptepartenaire = $this->getUser()->getCompte();
             $comptepartenaire->setSolde($comptepartenaire->getSolde()- $totalAretirer);
+            $comptepartenaire->setDatemaj(new \DateTime());
             $this->manager->persist($comptepartenaire);
             $transaction[0]->setCommissionEtat(0);
             $transaction[0]->setCommissionSystem($transaction[0]->getCommissionSystem()/2);
         
            $this->manager->persist($transaction[0]);
            $this->manager->flush();
-           return $this->json('Depot annulé avec succes : ',Response::HTTP_OK);
+           return $this->json('Transaction annulé avec succes : ',Response::HTTP_OK);
 
            
               

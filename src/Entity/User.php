@@ -21,7 +21,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * @ApiResource(
  * attributes={
  *      "pagination_enabled"=true,
- *      "security" = "is_granted('ROLE_Super-Admin')",
+ *      "security" = "(is_granted('ROLE_Super-Admin') or is_granted('ROLE_Partenaire') or is_granted('ROLE_Caissier'))",
  *      "security_message" = "vous n'avez pas accès a cette resource"
  *   },
  * collectionOperations={
@@ -123,6 +123,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="users")
+     * @Groups({"user:read"})
      */
     private $compte;
 

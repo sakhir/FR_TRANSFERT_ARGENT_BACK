@@ -108,23 +108,33 @@ class UserController extends AbstractController
         $user = $repo->find($id);
   
         $CurrentUser=$this->getUser();
-     
-
-         if($user->getPartenaire()->getId()!=$CurrentUser->getPartenaire()->getId()) {
-            return $this->json('vous n avez pas le droit de bloquer cet utilisateur  ',Response::HTTP_OK); 
-         }
-
-         else {
-            if ($this->isGranted('ROLE_Admin-Partenaire') && $user != null) {
+         
+            if ($this->isGranted('ROLE_Super-Admin') && $user != null) {
                 $user->setIsdeleted(1);
                 $em->flush();
-                return $this->json('Utilisateur bloqué ',Response::HTTP_OK); 
+                return $this->json('Utilisateur Supprimé avec succes  ',Response::HTTP_OK); 
             }
             return $this->json("Vous n avez pas le droit de faire cet opération ou  utilisateur inexistant !!!");
-         }
+         
 
        
     }
+
+     public function BloquerUser(UserRepository $repo,$id,EntityManagerInterface $em)
+    {
+        $user = $repo->find($id);
+
+
+           
+            if ($this->isGranted('ROLE_Super-Admin') && $user != null) {
+                $user->setStatut(1);
+                $em->flush();
+                return $this->json('Utilisateur bloqué avec succes  ',Response::HTTP_OK); 
+            }
+            return $this->json("Vous n avez pas le droit de faire cet opération ou  utilisateur inexistant !!!");
+         
+
        
+    }  
 
  }

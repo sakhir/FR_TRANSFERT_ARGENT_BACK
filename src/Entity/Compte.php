@@ -73,7 +73,7 @@ class Compte
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"partenaire","compte","depot"})
+     * @Groups({"partenaire","compte","depot","user:read"})
      */
     private $solde;
 
@@ -96,6 +96,12 @@ class Compte
      * @ORM\ManyToOne(targetEntity=Partenaire::class, inversedBy="compts")
      */
     private $partenaire;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"user:read"})
+     */
+    private $datemaj;
 
     public function __construct()
     {
@@ -236,6 +242,18 @@ class Compte
     public function setPartenaire(?Partenaire $partenaire): self
     {
         $this->partenaire = $partenaire;
+
+        return $this;
+    }
+
+    public function getDatemaj(): ?\DateTimeInterface
+    {
+        return $this->datemaj;
+    }
+
+    public function setDatemaj(?\DateTimeInterface $datemaj): self
+    {
+        $this->datemaj = $datemaj;
 
         return $this;
     }

@@ -34,7 +34,7 @@ editer_partenaire:
 bloquer_partenaire:
    path: /api/bloquer/partenaire/{id}
    controller: App\Controller\PartenaireController::BloquerPartenaire
-   methods: ['POST']
+   methods: ['DELETE']
 #faire-depot
 faire_depot:
    path: /api/faire/depot
@@ -63,16 +63,26 @@ recuperer_transaction_agence:
    controller: App\Controller\TransactionController::AfficherTransactionsAgence
    methods: ['GET']   
 
+#delete user
+delete_user:
+   path: /api/supprimer/user/{id}
+   controller: App\Controller\UserController::deleteUser
+   methods: ['DELETE']
 #Bloquer user
 bloquer_user:
    path: /api/bloquer/user/{id}
-   controller: App\Controller\UserController::deleteUser
+   controller: App\Controller\UserController::BloquerUser
    methods: ['DELETE']
 #annuler depot 
 annuler_depot:
    path: /api/annuler/dernier/depot
    controller: App\Controller\PartenaireController::AnnulerDepot
    methods: ['DELETE']
+#les transactions d un caissier 
+liste_depots_caissier:
+   path: /api/depots/{id}/caissier
+   controller: App\Controller\PartenaireController::DepotOneUser
+   methods: ['GET']
 #annuler transaction 
 annuler_transaction:
    path: /api/annuler/dernier/transaction

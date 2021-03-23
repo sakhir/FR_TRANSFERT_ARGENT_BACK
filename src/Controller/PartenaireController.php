@@ -61,6 +61,7 @@ class PartenaireController extends AbstractController
        $compte =(new Compte)
        ->setNumeroCompte($numCompte)
        ->setSolde(700000)
+       ->setDatemaj(new \DateTime())
        ->setCodeBank(5166616)
        ->setNomBeneficiaire($agencepart->getNomPartenaire())
        ->addUser($this->security->getUser());
@@ -231,6 +232,7 @@ class PartenaireController extends AbstractController
                   ->setMontantDepot($montantDepot)
                   ;
                    $compte[0]->setSolde($solde);
+                   $compte[0]->setDatemaj(new \DateTime());
                    $this->manager->persist($compte[0]);
                    $depot->setCompte($compte[0]);
                    $this->manager->persist($depot);
@@ -271,6 +273,7 @@ class PartenaireController extends AbstractController
          $solde=$sommeCompte-$sommeDepot;
          $compte=$dernierDepot->getCompte();
           $compte->setSolde($solde);
+          $compte->setDatemaj(new \DateTime());
          $compte->removeDepot($dernierDepot);
 
          $this->manager->persist($compte);
@@ -285,7 +288,28 @@ class PartenaireController extends AbstractController
               
           } 
           
+      //DepotOneUser
 
+      public function DepotOneUser($id)
+      {
+      
+       $caissier= $this->userRepo->find($id);
+      
+
+       if($caissier->getProfil()->getLibelle()=="Caissier") {
+         // recuperons les depots de cet utilisateur 
+         $depots=$caissier->getDepots();
+           if($depots) {
+            return $this->json($depots,Response::HTTP_OK,[],['groups'=>"depot"]);   
+           }
+           else {
+            return $this->json('Ce caissier n pas encore fait de depot     ',Response::HTTP_OK);     
+           }
+       } 
+       else {
+        return $this->json('Cet utilisateur n est pas un caissier     ',Response::HTTP_OK);
+       }  
+      }
 
           
 }

@@ -9,7 +9,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
@@ -55,6 +57,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * },
  * )
  * @ORM\Entity(repositoryClass=PartenaireRepository::class)
+ * @ApiFilter(SearchFilter::class, properties={ "statut": "exact"})
  */
 class Partenaire
 {
